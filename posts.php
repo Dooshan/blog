@@ -1,16 +1,41 @@
-<?php include "includes/header.php"; ?>
-        <div class="blog-post">
-          <h2 class="blog-post-title">Blog post 1</h2>
-          <p class="blog-post-meta">January 1, 2014 by <a href="#">Mark</a></p>
-          <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nihil error veniam ab minus assumenda delectus sint quo facilis laudantium quisquam!</p>
-          <a href="post.php?id=1" class="readmore">Read More</a>
-        </div><!-- /.blog-post -->
+<?php  include 'includes/header.php';   
+    // Create DB Object
+    $db = new Database(); 
 
+    //check URL for category
+    if(isset($_GET['category'])){
+        $category = $_GET['category'];
+        //Create Query 
+        $query = "SELECT * FROM posts WHERE category = '$category '";
+        //Run Query
+        $posts = $db->select($query);
+
+
+    }else {
+      //Create Query 
+      $query = "SELECT * FROM posts";
+      //Run Query
+      $posts = $db->select($query);
+    }
+  
+    //Create Query 
+    $query = "SELECT * FROM categories";
+    //Run Query
+    $categories = $db->select($query);
+?>
+
+<?php if($posts) : ?>
+  <?php while($row = $posts->fetch_assoc()) : ?>
         <div class="blog-post">
-          <h2 class="blog-post-title">Blog post 2</h2>
-          <p class="blog-post-meta">December 23, 2013 by <a href="#">Jacob</a></p>
-          <p>Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>
-          <a href="post.php?id=1" class="readmore">Read More</a>
+          <h2 class="blog-post-title"><?= $row['title'] ?></h2>
+          <p class="blog-post-meta"><?= formatDate($row['date']) ?> by <a href="#"><?=$row['author'] ?></a></p>
+          <p><?= shortenText($row['body']) ?></p>
+          <a href="post.php?id=<?=urlencode($row['id']) ?>" class="readmore">Read More</a> 
         </div><!-- /.blog-post -->
+  <?php endwhile; ?>
+<?php else : ?>
+  <p>There are no posts yet</p>
+<?php endif; ?>
 
 <?php include "includes/footer.php"; ?>
+
